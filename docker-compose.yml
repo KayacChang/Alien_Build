@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+  interface:
+    build:
+      context: "."
+      dockerfile: "./dockerfiles/interface/Dockerfile"
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+      - client
+
+  database:
+    build:
+      context: "."
+      dockerfile: "./dockerfiles/database/Dockerfile"
+    volumes:
+      - ./.db:/var/lib/postgresql/data
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+
+  redis:
+    image: "redis:alpine"
+
+  backend:
+    build:
+      context: "."
+      dockerfile: "./dockerfiles/server/Dockerfile"
+    depends_on:
+      - database
+      - redis
+
+  client:
+    build:
+      context: "."
+      dockerfile: "./dockerfiles/client/Dockerfile"
