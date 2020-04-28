@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://gitlab.fbk168.com/gamedevjp/alien/server.git
+	branch = master
+	commit = f7484910ecda9f6a2870151cf6401ea7a3ff9a36
+	parent = ee58a6218f2145e9d214d179d8e4301f3754c029
+	method = merge
+	cmdver = 0.4.1
