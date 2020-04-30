@@ -14,10 +14,10 @@ import (
 	"github.com/YWJSonic/ServerUtility/messagehandle"
 	"github.com/YWJSonic/ServerUtility/socket"
 	"github.com/gorilla/websocket"
+	"gitlab.fbk168.com/gamedevjp/alien/server/game/constants"
 	"gitlab.fbk168.com/gamedevjp/alien/server/game/db"
 	"gitlab.fbk168.com/gamedevjp/alien/server/game/gamerule"
 	"gitlab.fbk168.com/gamedevjp/alien/server/game/protoc"
-	"gitlab.fbk168.com/gamedevjp/cat/server/game/constants"
 )
 
 func (g *Game) createNewSocket(w http.ResponseWriter, r *http.Request) {
