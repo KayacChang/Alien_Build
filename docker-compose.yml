@@ -9,7 +9,7 @@ services:
       - "3000:80"
     depends_on:
       - backend
-      - client
+      # - client
 
   database:
     build:
@@ -33,7 +33,7 @@ services:
       - database
       - redis
 
-  client:
-    build:
-      context: "."
-      dockerfile: "./dockerfiles/client/Dockerfile"
+  # client:
+  #   build:
+  #     context: "."
+  #     dockerfile: "./dockerfiles/client/Dockerfile"
