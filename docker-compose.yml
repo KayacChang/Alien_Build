@@ -6,7 +6,7 @@ services:
       context: "."
       dockerfile: "./dockerfiles/interface/Dockerfile"
     ports:
-      - "3000:80"
+      - "3002:80"
     depends_on:
       - backend
       - client
