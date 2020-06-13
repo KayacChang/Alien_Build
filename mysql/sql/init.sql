@@ -119,10 +119,11 @@ USE `gamedb`;
 
 CREATE TABLE IF NOT EXISTS `attach` (
   `PlayerID` bigint NOT NULL,
+  `PlayerIDStr` varchar(128) NOT NULL,
   `Kind` bigint NOT NULL,
   `Type` bigint NOT NULL,
   `IValue` bigint NOT NULL,
-  PRIMARY KEY (`PlayerID`,`Kind`,`Type`)
+  PRIMARY KEY (`PlayerID`,`Kind`,`Type`,`PlayerIDStr`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `setting` (
