@@ -29,6 +29,10 @@ export function Service(url) {
             throw new Error(`User Access Tokens is empty`);
         }
 
+        const homeURL =
+            new URL(location).searchParams.get('lobby') ||
+            localStorage.getItem('lobby');
+
         history.pushState(
             undefined,
             undefined,
@@ -37,6 +41,7 @@ export function Service(url) {
 
         global.addEventListener('popstate', () => history.back());
 
+        if (homeURL) localStorage.setItem('lobby', homeURL);
         localStorage.setItem('token', token);
 
         return token;

@@ -202,6 +202,10 @@ function Nav(menu, sections) {
 
                 return open(target);
             }
+
+            if (name === 'home') {
+                return app.alert.leave(localStorage['lobby']);
+            }
         }
     }
 

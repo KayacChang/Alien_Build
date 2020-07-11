@@ -7,7 +7,26 @@ import {Service} from './service';
 import Swal from './system/plugin/swal';
 import {Translate} from './system/modules/translate';
 
-import {enableFullScreenMask} from './system/modules/screen';
+import {
+    iPhoneFullScreen,
+    isMobile,
+    isFullScreenSupport,
+    requestFullScreen,
+} from './system/modules/device';
+
+function enableFullscreen() {
+    if (!isMobile()) {
+        return;
+    }
+
+    if (isFullScreenSupport(window.document.body)) {
+        document.addEventListener('touchend', () =>
+            requestFullScreen(window.document.body),
+        );
+    }
+
+    iPhoneFullScreen();
+}
 
 async function main() {
     //  Init App
@@ -36,7 +55,7 @@ async function main() {
         app.stage.addChild(loadScene);
         app.resize();
 
-        enableFullScreenMask();
+        enableFullscreen();
 
         //  Import Main Scene
         const [MainScene, UserInterface, initData] = await Promise.all([
