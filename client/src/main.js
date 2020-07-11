@@ -37,7 +37,7 @@ async function main() {
 
         global.translate = await Translate(process.env.I18N_URL);
 
-        app.alert = Swal();
+        app.alert = Swal(global.translate);
         app.service = new Service(process.env.SERVER_URL);
 
         // Import Load Scene
