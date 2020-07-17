@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://gitlab.fbk168.com/gamedevjp/alien/server.git
 	branch = master
-	commit = fe2f2f0a2f114faaa8a92d4a8bc6b97fda73ad31
-	parent = ef25076e8a9a696762d2ee37f83f9c787800e4f7
+	commit = e6ff02707f8c7c50f58ff518175b1f423fe53740
+	parent = b438a64e470cd40b85af3659e456b15ce63e7a17
 	method = merge
 	cmdver = 0.4.1
