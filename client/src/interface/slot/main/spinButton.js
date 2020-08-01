@@ -1,26 +1,25 @@
-import {Clickable, defaultFont} from '../../components';
-import {Container, Text} from 'pixi.js';
-import anime from 'animejs';
-import {setBehaviour} from './button';
+import {Clickable, defaultFont} from '../../components'
+import {Container, Text} from 'pixi.js'
+import anime from 'animejs'
+import {setBehaviour} from './button'
 
-import {pi, clone} from '@kayac/utils';
+import {pi, clone} from '@kayac/utils'
 
-const {assign} = Object;
+const {assign} = Object
 
-export function SpinButton(view) {
-    let it = Clickable(
-        view.getChildByName('spin'),
-    );
+export function SpinButton (view) {
+    let it = Clickable(view.getChildByName('spin'))
+
+    it.getChildByName('mask').alpha = Number.MIN_VALUE
 
     it.originScale = {
         x: it.scale.x,
         y: it.scale.y,
-    };
+    }
 
-    const img = it.getChildByName('frame');
+    const img = it.getChildByName('frame')
 
-    const block =
-        view.getChildByName('block');
+    const block = view.getChildByName('block')
 
     const msg = defaultFont(
         new Text(translate('common:message.insufficientBalance')),
@@ -31,188 +30,181 @@ export function SpinButton(view) {
             stroke: '#121212',
             strokeThickness: 5,
         },
-    );
+    )
 
-    const comp = new Container();
-    comp.addChild(msg);
-    comp.position.set(view.width / 2, view.height / 2 - msg.height);
-    msg.alpha = 0;
-    msg.pivot.set(comp.width / 2, comp.height / 2);
-    view.addChild(comp);
+    const comp = new Container()
+    comp.addChild(msg)
+    comp.position.set(view.width / 2, view.height / 2 - msg.height)
+    msg.alpha = 0
+    msg.pivot.set(comp.width / 2, comp.height / 2)
+    view.addChild(comp)
 
-    setBehaviour(it);
+    setBehaviour(it)
 
-    let isBlocking = false;
-    let isRunning = false;
-    let isAuto = false;
-    let isQuickStop = false;
-    let whenAnim = false;
-    let count = 0;
-    let speed = app.user.speed;
+    let isBlocking = false
+    let isRunning = false
+    let isAuto = false
+    let isQuickStop = false
+    let whenAnim = false
+    let count = 0
+    let speed = app.user.speed
 
-    const countField =
-        defaultFont(new Text(), {
-            fontFamily: 'Candal',
-            fontSize: 48,
-            fill: '#FAFAFA',
-        });
-    it.addChildAt(
-        countField,
-        it.getChildIndex(
-            it.getChildByName('hover'),
-        ),
-    );
+    const countField = defaultFont(new Text(), {
+        fontFamily: 'Candal',
+        fontSize: 48,
+        fill: '#FAFAFA',
+    })
+    it.addChildAt(countField, it.getChildIndex(it.getChildByName('hover')))
 
-    countField.anchor.set(.5);
+    countField.anchor.set(0.5)
 
-    countField.position
-        .set(
-            it.getChildByName('down').x,
-            it.getChildByName('down').y
-        );
+    countField.position.set(
+        it.getChildByName('down').x,
+        it.getChildByName('down').y,
+    )
 
     const auto = {
-        get() {
-            return count;
+        get () {
+            return count
         },
-        set(newCount) {
-            count = newCount;
+        set (newCount) {
+            count = newCount
 
             if (newCount === 0) {
-                countField.text = '';
+                countField.text = ''
 
-                isAuto = false;
+                isAuto = false
 
-                return;
+                return
             }
 
-            countField.text = newCount;
+            countField.text = newCount
 
-            isAuto = true;
+            isAuto = true
         },
-    };
+    }
 
-    it = assign(it, {auto});
+    it = assign(it, {auto})
 
-    const arrow = it.getChildByName('arrow');
-    const arrowScale = clone(arrow.scale);
+    const arrow = it.getChildByName('arrow')
+    const arrowScale = clone(arrow.scale)
 
-    const square = it.getChildByName('square');
+    const square = it.getChildByName('square')
 
     if (cashLessThanBet()) {
-        img.tint = 0x999999;
-        isBlocking = true;
+        img.tint = 0x999999
+        isBlocking = true
 
-        it.auto.set(0);
+        it.auto.set(0)
     } else {
-        img.tint = 0xFFFFFF;
-        isBlocking = false;
+        img.tint = 0xffffff
+        isBlocking = false
     }
 
-    it.on('Click', onClick);
+    it.on('Click', onClick)
 
-    app.on('Idle', checkState);
+    app.on('Idle', checkState)
 
-    app.on('UserStatusChange', checkButton);
-    app.on('UserBetChange', checkButton);
-    app.on('UserAutoChange', checkButton);
+    app.on('UserStatusChange', checkButton)
+    app.on('UserBetChange', checkButton)
+    app.on('UserAutoChange', checkButton)
 
-    return it;
+    return it
 
-    function checkButton() {
+    function checkButton () {
         if (cashLessThanBet()) {
-            img.tint = 0x999999;
-            isBlocking = true;
+            img.tint = 0x999999
+            isBlocking = true
 
-            it.auto.set(0);
+            it.auto.set(0)
         } else {
-            img.tint = 0xFFFFFF;
-            isBlocking = false;
+            img.tint = 0xffffff
+            isBlocking = false
         }
 
-        const auto = app.user.autoOptions[app.user.auto];
-        it.auto.set(auto);
+        const auto = app.user.autoOptions[app.user.auto]
+        it.auto.set(auto)
     }
 
-    function checkState() {
+    function checkState () {
         if (cashLessThanBet()) {
             if (!whenAnim) {
-                whenAnim = true;
-                view.openMenu('exchange')
-                    .then(() => whenAnim = false);
+                whenAnim = true
+                view.openMenu('exchange').then(() => (whenAnim = false))
             }
 
-            return spinEnd();
+            return spinEnd()
         }
 
         if (it.auto.get() > 0 && isAuto && isRunning) {
-            isRunning = false;
-            play();
+            isRunning = false
+            play()
         } else {
-            spinEnd();
+            spinEnd()
         }
     }
 
-    function spinEnd() {
-        anime.remove(arrow);
+    function spinEnd () {
+        anime.remove(arrow)
 
         anime({
             targets: square.scale,
-            x: 0, y: 0,
-        });
+            x: 0,
+            y: 0,
+        })
 
         anime({
             targets: arrow.scale,
             x: arrowScale.x,
             y: arrowScale.y,
-        });
+        })
 
         anime({
             targets: arrow,
-            rotation: '-=' + arrow.rotation % (2 * pi),
+            rotation: '-=' + (arrow.rotation % (2 * pi)),
             alpha: 1,
-        });
+        })
 
         anime({
             targets: view,
             alpha: 1,
             easing: 'easeOutCubic',
-        });
+        })
 
         requestAnimationFrame(() => {
-            view.menuBtn.interactive = true;
-            view.option.btn.interactive = true;
+            view.menuBtn.interactive = true
+            view.option.btn.interactive = true
 
-            isRunning = false;
-            isQuickStop = false;
+            isRunning = false
+            isQuickStop = false
 
-            app.user.speed = speed;
+            app.user.speed = speed
 
-            checkButton();
-        });
+            checkButton()
+        })
     }
 
-    function cashLessThanBet() {
-        return app.user.cash < app.user.betOptions[app.user.bet];
+    function cashLessThanBet () {
+        return app.user.cash < app.user.betOptions[app.user.bet]
     }
 
-    function onClick() {
-        if (whenAnim) return;
+    function onClick () {
+        if (whenAnim) return
         if (isBlocking) {
-            if (isRunning) return;
+            if (isRunning) return
 
-            whenAnim = true;
+            whenAnim = true
             anime({
                 targets: msg,
                 alpha: 1,
                 duration: 500,
                 direction: 'alternate',
                 easing: 'easeOutExpo',
-                complete() {
-                    msg.alpha = 0;
-                    whenAnim = false;
+                complete () {
+                    msg.alpha = 0
+                    whenAnim = false
                 },
-            });
+            })
 
             anime({
                 targets: block,
@@ -220,41 +212,41 @@ export function SpinButton(view) {
                 duration: 500,
                 direction: 'alternate',
                 easing: 'easeOutExpo',
-                complete() {
-                    block.alpha = 0;
-                    whenAnim = false;
+                complete () {
+                    block.alpha = 0
+                    whenAnim = false
                 },
-            });
+            })
 
-            app.sound.play('cancel');
+            app.sound.play('cancel')
 
-            return;
+            return
         }
 
         if (isRunning) {
-            app.user.auto = 0;
-            it.auto.set(0);
+            app.user.auto = 0
+            it.auto.set(0)
 
-            const max = app.user.speedOptions.length - 1;
-            app.user.speed = max;
+            const max = app.user.speedOptions.length - 1
+            app.user.speed = max
 
             if (!isQuickStop) {
-                isQuickStop = true;
+                isQuickStop = true
 
-                setTimeout(() => app.emit('QuickStop'), 250);
+                setTimeout(() => app.emit('QuickStop'), 250)
             }
 
-            return;
+            return
         }
 
-        return play();
+        return play()
     }
 
-    function play() {
-        if (isRunning) return;
+    function play () {
+        if (isRunning) return
 
-        it.scale.x -= 0.1;
-        it.scale.y -= 0.1;
+        it.scale.x -= 0.1
+        it.scale.y -= 0.1
 
         anime({
             targets: it.scale,
@@ -262,22 +254,24 @@ export function SpinButton(view) {
             y: it.originScale.y,
             easing: 'easeOutElastic(1, .5)',
             duration: 300,
-        });
+        })
 
         anime({
             targets: square.scale,
-            x: 1, y: 1,
-        });
+            x: 1,
+            y: 1,
+        })
 
         anime({
             targets: arrow.scale,
-            x: 0, y: 0,
-        });
+            x: 0,
+            y: 0,
+        })
 
         anime({
             targets: arrow,
             alpha: 0,
-        });
+        })
 
         anime({
             targets: arrow,
@@ -285,36 +279,37 @@ export function SpinButton(view) {
             loop: true,
             easing: 'linear',
             duration: 1000,
-        });
+        })
 
         anime({
             targets: view,
             alpha: 0.6,
             easing: 'easeOutCubic',
             duration: 1000,
-        });
+        })
 
-        app.sound.play('spin');
+        app.sound.play('spin')
 
-        app.user.cash -= app.user.betOptions[app.user.bet];
-        app.user.lastWin = 0;
+        app.user.cash -= app.user.betOptions[app.user.bet]
+        app.user.lastWin = 0
 
-        speed = app.user.speed;
-        view.menuBtn.interactive = false;
-        view.option.btn.interactive = false;
+        speed = app.user.speed
+        view.menuBtn.interactive = false
+        view.option.btn.interactive = false
 
-        isRunning = true;
+        isRunning = true
 
         if (auto.get() > 0) {
-            auto.set(auto.get() - 1);
+            auto.set(auto.get() - 1)
         }
 
-        const key = process.env.KEY;
+        const key = process.env.KEY
 
         app.service
             .sendOneRound({
-                key, bet: app.user.bet,
+                key,
+                bet: app.user.bet,
             })
-            .then((result) => app.emit('GameResult', result));
+            .then((result) => app.emit('GameResult', result))
     }
 }
