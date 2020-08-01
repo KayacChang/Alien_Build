@@ -4,8 +4,7 @@ import './styles/swal.scss';
 import ALERT from './sounds/alert01.mp3';
 import SUCCESS from './sounds/success01.mp3';
 
-
-export default function() {
+export default function (translate) {
     const defaultStyle = {
         background: '#212121',
         confirmButtonText: translate(`common:button.confirm`),
@@ -17,9 +16,7 @@ export default function() {
     function playAudio(url) {
         if (app.sound.mute()) return;
 
-        return new Audio(url)
-            .play()
-            .catch((err) => console.log(err));
+        return new Audio(url).play().catch((err) => console.log(err));
     }
 
     function error(msg) {
@@ -31,11 +28,10 @@ export default function() {
             confirmButtonText: translate(`common:button.back`),
             confirmButtonColor: '#DC3446',
 
-            ...(msg),
+            ...msg,
         };
 
-        return Swal.fire(config)
-            .then(() => history.back());
+        return Swal.fire(config).then(() => history.back());
     }
 
     function reload(msg) {
@@ -47,11 +43,10 @@ export default function() {
             confirmButtonText: translate(`common:button.refresh`),
             confirmButtonColor: '#DC3446',
 
-            ...(msg),
+            ...msg,
         };
 
-        return Swal.fire(config)
-            .then(() => location.reload());
+        return Swal.fire(config).then(() => location.reload());
     }
 
     function request(data) {
@@ -61,7 +56,7 @@ export default function() {
             type: 'warning',
             showCancelButton: true,
 
-            ...(data),
+            ...data,
         };
 
         playAudio(ALERT);
@@ -77,7 +72,7 @@ export default function() {
             allowOutsideClick: false,
             onBeforeOpen: () => Swal.showLoading(),
 
-            ...(msg),
+            ...msg,
         };
         return Swal.fire(config);
     }
@@ -101,7 +96,7 @@ export default function() {
         return Swal.fire(config);
     }
 
-    function leave() {
+    function leave(url) {
         const config = {
             ...defaultStyle,
 
@@ -113,8 +108,18 @@ export default function() {
             cancelButtonColor: '#007BFF',
         };
 
-        return Swal.fire(config)
-            .then(({value}) => (value) && history.back());
+        return Swal.fire(config).then(({value}) => {
+            if (!value) {
+                return;
+            }
+
+            if (!url) {
+                history.back();
+                return;
+            }
+
+            window.location.replace(url);
+        });
     }
 
     function checkoutList({gold, gift, etc, bonus}) {
@@ -150,19 +155,16 @@ export default function() {
                 const image = new Image();
                 image.src = host + url + '.png';
 
-                const text =
-                    document.createElement('div');
+                const text = document.createElement('div');
 
                 text.textContent = money;
 
-                const container =
-                    document.createElement('div');
+                const container = document.createElement('div');
 
                 container.append(image, text);
                 container.classList.add('text-center', 'number-font');
 
-                const item =
-                    document.createElement('li');
+                const item = document.createElement('li');
 
                 item.append(container);
 
@@ -182,7 +184,13 @@ export default function() {
     }
 
     return {
-        error, leave, loading, close, reload,
-        success, checkoutList, request,
+        error,
+        leave,
+        loading,
+        close,
+        reload,
+        success,
+        checkoutList,
+        request,
     };
 }
