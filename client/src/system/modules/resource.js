@@ -1,54 +1,54 @@
-import {LoaderResource} from 'pixi.js'
+import {LoaderResource} from 'pixi.js';
 
-import {Howl} from 'howler'
+import {Howl} from 'howler';
 
-import {load as loadFont} from 'webfontloader'
+import {load as loadFont} from 'webfontloader';
 
-export function Resource (app) {
-    console.log(app)
-    const loader = app.loader
+export function Resource(app) {
+    console.log(app);
+    const loader = app.loader;
     loader
         //  For Sound Loading
         .pre(SoundHandler)
         //  For Font Loading
-        .pre(WebFontLoader)
+        .pre(WebFontLoader);
 
     //  For Loading Progress
     loader.onProgress.add((...args) => {
-        app.emit('loading', ...args)
-    })
+        app.emit('loading', ...args);
+    });
 
-    return {get, load, fetch, reset}
+    return {get, load, fetch, reset};
 
-    function get (name) {
-        return loader.resources[name]
+    function get(name) {
+        return loader.resources[name];
     }
 
-    function fetch (...tasks) {
-        const _tasks = tasks.filter((name) => !loader.resources[name])
+    function fetch(...tasks) {
+        const _tasks = tasks.filter((name) => !loader.resources[name]);
 
-        loader.add(_tasks)
+        loader.add(_tasks);
 
         return new Promise((resolve) => {
             if (_tasks.length === 0) {
                 const results = tasks.map((task) => {
-                    return loader.resources[task]
-                })
+                    return loader.resources[task];
+                });
 
-                return resolve(results)
+                return resolve(results);
             }
 
             loader.load((loader, resources) => {
                 const results = tasks.map((task) => {
-                    return resources[task]
-                })
+                    return resources[task];
+                });
 
-                resolve(results)
-            })
-        })
+                resolve(results);
+            });
+        });
     }
 
-    function load (...scenes) {
+    function load(...scenes) {
         scenes
             .map(({reserve}) => reserve())
             .forEach((tasks) => {
@@ -57,81 +57,82 @@ export function Resource (app) {
                     .map((res) => {
                         const task = new LoaderResource(res.name, '', {
                             loadType: LoaderResource.LOAD_TYPE.AUDIO,
-                        })
+                        });
 
-                        task.metadata = res
+                        task.metadata = res;
 
-                        return task
-                    })
+                        return task;
+                    });
 
-                const normals = tasks.filter(({type}) => type !== 'sound')
+                const normals = tasks.filter(({type}) => type !== 'sound');
 
-                return loader.add([...normals, ...soundTasks])
-            })
+                return loader.add([...normals, ...soundTasks]);
+            });
 
-        return new Promise((resolve) => loader.load(resolve))
+        return new Promise((resolve) => loader.load(resolve));
     }
 
-    function reset () {
-        loader.reset()
+    function reset() {
+        loader.reset();
     }
 
-    function SoundHandler (resource, next) {
-        if (check(resource)) return next()
+    function SoundHandler(resource, next) {
+        if (check(resource)) return next();
 
-        const {LOADING} = LoaderResource.STATUS_FLAGS
-        resource._setFlag(LOADING, true)
+        const {LOADING} = LoaderResource.STATUS_FLAGS;
+        resource._setFlag(LOADING, true);
 
-        const task = resource.metadata
+        const task = resource.metadata;
 
         resource.data = new Howl({
             ...task,
+            html5: true,
             onload,
             onloaderror,
-        })
+        });
 
-        function check (resource) {
+        function check(resource) {
             return (
                 !resource ||
                 resource.loadType !== LoaderResource.LOAD_TYPE.AUDIO
-            )
+            );
         }
 
-        function onload () {
-            resource.complete()
+        function onload() {
+            resource.complete();
 
-            next()
+            next();
         }
 
-        function onloaderror (id, message) {
-            console.error(resource)
-            resource.abort(message)
-            next()
+        function onloaderror(id, message) {
+            console.error(resource);
+            resource.abort(message);
+            next();
         }
     }
 }
 
-function WebFontLoader (resource, next) {
-    if (check()) return next()
+function WebFontLoader(resource, next) {
+    if (check()) return next();
 
     loadFont({
         ...resource.metadata,
         active,
         inactive,
-    })
+    });
 
-    function check () {
-        return !resource || resource.name !== 'font'
+    function check() {
+        return !resource || resource.name !== 'font';
     }
 
-    function active () {
-        resource.complete()
-        next()
+    function active() {
+        resource.complete();
+        next();
     }
 
-    function inactive () {
-        console.error(resource)
-        resource.abort(message)
-        next()
+    function inactive() {
+        console.error(resource);
+        resource.abort(message);
+        next();
     }
 }

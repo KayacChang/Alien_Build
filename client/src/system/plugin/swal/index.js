@@ -1,7 +1,6 @@
 import Swal from 'sweetalert2/dist/sweetalert2';
 import './styles/swal.scss';
 
-import ALERT from './sounds/alert01.mp3';
 import SUCCESS from './sounds/success01.mp3';
 
 export default function (translate) {
@@ -58,8 +57,6 @@ export default function (translate) {
 
             ...data,
         };
-
-        playAudio(ALERT);
 
         return Swal.fire(config);
     }
